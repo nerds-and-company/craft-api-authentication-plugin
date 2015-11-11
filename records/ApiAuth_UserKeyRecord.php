@@ -44,7 +44,7 @@ class ApiAuth_UserKeyRecord extends BaseRecord
     public function defineRelations()
     {
         return [
-            'user' => [static::BELONGS_TO, 'UserRecord', 'required' => true],
+            'user' => array(static::BELONGS_TO, 'UserRecord', 'required' => true),
         ];
     }
 }
