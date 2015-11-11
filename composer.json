@@ -1,0 +1,17 @@
+{
+    "name": "nerds-and-company/apiauth",
+    "description": "Api authentication for Craft CMS",
+    "authors": [
+        {
+            "name": "Bart van Gennep",
+            "email": "b.vangennep@nerds.company",
+            "homepage": "http://github.com/nerds-and-company",
+            "role": "Developer"
+        }
+    ],
+    "type": "craft-plugin",
+    "require": {
+        "composer/installers": "~1.0",
+        "php": "^5.3"
+    }
+}
