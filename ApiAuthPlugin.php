@@ -62,10 +62,8 @@ class ApiAuthPlugin extends BasePlugin
      */
     public function registerSiteRoutes()
     {
-        $routes = [
-            'api/authenticate' => ['action' => 'apiAuth/authenticate'],
-        ];
-
-        return $routes;
+        return array(
+            'api/authenticate' => array('action' => 'apiAuth/authenticate')
+        );
     }
 }
