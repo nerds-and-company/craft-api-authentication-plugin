@@ -19,7 +19,6 @@ class ApiAuthService extends BaseApplicationComponent
      */
     public function authenticateKey($key)
     {
-        /** @var  $userKeyModel */
         $userKeyModel = $this->getUserKeyModelByKey($key);
         if($userKeyModel) {
             return craft()->userSession->loginByUserId($userKeyModel->userId);
