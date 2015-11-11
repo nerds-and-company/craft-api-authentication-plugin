@@ -18,27 +18,6 @@ class ApiAuthController extends BaseController
     /** @var bool */
     protected $allowAnonymous = array('authenticate');
 
-    /** @var HttpRequestService  */
-    private $requestService;
-
-    /** @var UserSessionService */
-    private $userSessionService;
-
-    /** @var ApiAuthService */
-    private $apiAuthService;
-
-    /**
-     * @param string $id
-     */
-    public function __construct($id)
-    {
-        parent::__construct($id);
-
-        $this->requestService = craft()->request;
-        $this->userSessionService = craft()->userSession;
-        $this->apiAuthService = craft()->apiAuth;
-    }
-
     /**
      * Authenticate action.
      */
@@ -47,14 +26,14 @@ class ApiAuthController extends BaseController
         try{
             $this->requirePostRequest();
 
-            $username = $this->requestService->getRequiredPost('username');
-            $password = $this->requestService->getRequiredPost('password');
+            $username = craft()->request->getRequiredPost('username');
+            $password = craft()->request->getRequiredPost('password');
 
-            if($this->userSessionService->login($username, $password)){
-                $key = $this->apiAuthService->generateKey();
-                $user = $this->userSessionService->getUser();
+            if(craft()->userSession->login($username, $password)){
+                $key = craft()->apiAuth->generateKey();
+                $user = craft()->userSession->getUser();
 
-                if($this->apiAuthService->saveKey($user, $key)){
+                if(craft()->apiAuth->saveKey($user, $key)){
                     $this->returnJson(array(
                         'key' => $key,
                     ));

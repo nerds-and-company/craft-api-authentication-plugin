@@ -19,7 +19,12 @@ class ApiAuthService extends BaseApplicationComponent
      */
     public function authenticateKey($key)
     {
-        return ApiAuth_UserKeyRecord::model()->findByAttributes(array('key' => $key)) !== null;
+        /** @var  $userKeyModel */
+        $userKeyModel = $this->getUserKeyModelByKey($key);
+        if($userKeyModel) {
+            return craft()->userSession->loginByUserId($userKeyModel->userId);
+        }
+        return false;
     }
 
     /**
@@ -42,5 +47,14 @@ class ApiAuthService extends BaseApplicationComponent
         $model->key = $key;
         $model->expires = new DateTime('+ 1 week');
         return $model->save();
+    }
+
+    /**
+     * @param $key
+     * @return ApiAuth_UserKeyModel
+     */
+    private function getUserKeyModelByKey($key)
+    {
+        return ApiAuth_UserKeyRecord::model()->findByAttributes(array('key' => $key));
     }
 }
