@@ -4,7 +4,14 @@ namespace Craft;
 
 /**
  * Class ApiAuthController
+ *
  * Api authentication using user keys
+ *
+ * @author    Nerds & Company
+ * @copyright Copyright (c) 2015, Nerds & Company
+ * @license   MIT
+ *
+ * @link      http://www.nerds.company
  */
 class ApiAuthController extends BaseController
 {

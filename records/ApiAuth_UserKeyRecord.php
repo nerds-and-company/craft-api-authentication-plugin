@@ -5,6 +5,12 @@ namespace Craft;
 /**
  * Class ApiAuth_UserKeyRecord.
  *
+ * @author    Nerds & Company
+ * @copyright Copyright (c) 2015, Nerds & Company
+ * @license   MIT
+ *
+ * @link      http://www.nerds.company
+ *
  * @property int $id
  * @property int $userId
  * @property string $key

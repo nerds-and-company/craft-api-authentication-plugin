@@ -4,6 +4,12 @@ namespace Craft;
 
 /**
  * Class ApiAuthService.
+ *
+ * @author    Nerds & Company
+ * @copyright Copyright (c) 2015, Nerds & Company
+ * @license   MIT
+ *
+ * @link      http://www.nerds.company
  */
 class ApiAuthService extends BaseApplicationComponent
 {
@@ -13,7 +19,7 @@ class ApiAuthService extends BaseApplicationComponent
      */
     public function authenticateKey($key)
     {
-        return ApiAuth_UserKeyRecord::model()->findByAttributes(['key' => $key]) !== null;
+        return ApiAuth_UserKeyRecord::model()->findByAttributes(array('key' => $key)) !== null;
     }
 
     /**
