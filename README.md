@@ -4,3 +4,7 @@
 [![Code Coverage](https://scrutinizer-ci.com/g/nerds-and-company/craft-api-authentication-plugin/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/nerds-and-company/craft-api-authentication-plugin/?branch=master)
 
 Plugin to allow generation of an access token for use in api clients
+
+You can post a username and password to the url /api/authenticate
+When these are valid credentials you will get an access token,
+This access token can be authenticated in the ApiAuthService
