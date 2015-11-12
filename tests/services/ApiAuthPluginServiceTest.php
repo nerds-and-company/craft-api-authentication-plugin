@@ -46,12 +46,14 @@ class ApiAuthServiceTest extends BaseTest
 
     /**
      * @covers ::authenticateKey
+     * @dataProvider provideInvalidUserKeyModelAttributes
+     *
+     * @param string $key
+     * @param int $userId
+     * @param DateTime $expires
      */
-    public function testAuthenticateKeyShouldReturnFalseWhenKeyExpired()
+    public function testAuthenticateKeyShouldReturnFalseWhenKeyExpired($key, $userId, DateTime $expires)
     {
-        $key = 'test123';
-        $expires = new DateTime('- 1 minute');
-
         $mockUserKeyModel = $this->getMockUserKeyModel();
         $mockUserKeyModel->expects($this->exactly(1))
             ->method('__get')
@@ -59,7 +61,7 @@ class ApiAuthServiceTest extends BaseTest
                 array('expires', $expires),
             ));
 
-        $service = $this->setMockApiAuthServiceUserKeyModelByKey($key, $mockUserKeyModel);
+        $service = $this->setMockApiAuthService('getUserKeyModelByKey', $key, $mockUserKeyModel);
 
         $result = $service->authenticateKey($key);
         $this->assertFalse($result);
@@ -67,12 +69,13 @@ class ApiAuthServiceTest extends BaseTest
 
     /**
      * @covers ::authenticateKey
+     * @dataProvider provideValidUserKeyModelAttributes
+     *
+     * @param string $key
      */
-    public function testAuthenticateKeyShouldReturnFalseWhenKeyNotFound()
+    public function testAuthenticateKeyShouldReturnFalseWhenKeyNotFound($key)
     {
-        $key = 'test123';
-
-        $service = $this->setMockApiAuthServiceUserKeyModelByKey($key);
+        $service = $this->setMockApiAuthService('getUserKeyModelByKey', $key);
 
         $result = $service->authenticateKey($key);
         $this->assertFalse($result);
@@ -80,13 +83,14 @@ class ApiAuthServiceTest extends BaseTest
 
     /**
      * @covers ::authenticateKey
+     * @dataProvider provideValidUserKeyModelAttributes
+     *
+     * @param string $key
+     * @param int $userId
+     * @param DateTime $expires
      */
-    public function testAuthenticateKeyShouldLoginUserWhenKeyValid()
+    public function testAuthenticateKeyShouldLoginUserWhenKeyValid($key, $userId, DateTime $expires)
     {
-        $userId = 1;
-        $key = 'test123';
-        $expires = new DateTime('+ 1 minute');
-
         $mockUserKeyModel = $this->getMockUserKeyModel();
         $mockUserKeyModel->expects($this->exactly(2))
             ->method('__get')
@@ -97,7 +101,7 @@ class ApiAuthServiceTest extends BaseTest
 
         $this->setMockUserSessionService($userId);
 
-        $service = $this->setMockApiAuthServiceUserKeyModelByKey($key, $mockUserKeyModel);
+        $service = $this->setMockApiAuthService('getUserKeyModelByKey', $key, $mockUserKeyModel);
 
         $result = $service->authenticateKey($key);
         $this->assertTrue($result);
@@ -105,19 +109,16 @@ class ApiAuthServiceTest extends BaseTest
 
     /**
      * @covers ::saveKey
+     * @dataProvider provideValidUserKeyModelAttributes
+     *
+     * @param string $key
+     * @param int $userId
      */
-    public function testSaveKeyShouldReturnTrueWhenSavingSucceeds()
+    public function testSaveKeyShouldReturnTrueWhenSavingSucceeds($key, $userId)
     {
-        $key = 'test123';
-        $userId = 1;
-
         $mockUser = $this->getMockUser($userId);
-        $mockUserKeyModel = $this->getMockUserKeyModel();
-        $mockUserKeyModel->expects($this->exactly(1))
-            ->method('save')
-            ->willReturn(true);
-
-        $service = $this->setMockApiAuthServiceNewUserKeyModel($mockUserKeyModel);
+        $mockUserKeyModel = $this->setMockUserKeyModelSaveExpectation(true);
+        $service = $this->setMockApiAuthService('getNewUserKeyModel', 'skip', $mockUserKeyModel);
 
         $result = $service->saveKey($mockUser, $key);
 
@@ -126,23 +127,52 @@ class ApiAuthServiceTest extends BaseTest
 
     /**
      * @covers ::saveKey
+     * @dataProvider provideInvalidUserKeyModelAttributes
+     *
+     * @param string $key
+     * @param int $userId
      */
-    public function testSaveKeyShouldReturnFalseWhenSavingFails()
+    public function testSaveKeyShouldReturnFalseWhenSavingFails($key, $userId)
     {
-        $key = 'test123';
-        $userId = 1;
-
         $mockUser = $this->getMockUser($userId);
-        $mockUserKeyModel = $this->getMockUserKeyModel();
-        $mockUserKeyModel->expects($this->exactly(1))
-            ->method('save')
-            ->willReturn(false);
-
-        $service = $this->setMockApiAuthServiceNewUserKeyModel($mockUserKeyModel);
+        $mockUserKeyModel = $this->setMockUserKeyModelSaveExpectation(false);
+        $service = $this->setMockApiAuthService('getNewUserKeyModel', 'skip', $mockUserKeyModel);
 
         $result = $service->saveKey($mockUser, $key);
 
         $this->assertFalse($result);
+    }
+
+    //==============================================================================================================
+    //==============================================  PROVIDERS  ===================================================
+    //==============================================================================================================
+
+    /**
+     * @return array
+     */
+    public function provideValidUserKeyModelAttributes()
+    {
+        return array(
+            'valid key' => array(
+                'key' => 'test123',
+                'userId' => 1,
+                'expires' => new DateTime('+ 1 minute'),
+            )
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function provideInvalidUserKeyModelAttributes()
+    {
+        return array(
+            'invalid key' => array(
+                'key' => 'anotherkey',
+                'userId' => 2,
+                'expires' => new DateTime('- 1 minute'),
+            )
+        );
     }
 
     //==============================================================================================================
@@ -201,34 +231,34 @@ class ApiAuthServiceTest extends BaseTest
     }
 
     /**
+     * @param array $methodName
+     * @param mixed $param
      * @param ApiAuth_UserKeyModel $mockUserKeyModel
-     * @param string $key
      * @return ApiAuthService|mock
      */
-    private function setMockApiAuthServiceUserKeyModelByKey($key, ApiAuth_UserKeyModel $mockUserKeyModel = null)
+    private function setMockApiAuthService($methodName, $param, ApiAuth_UserKeyModel $mockUserKeyModel = null)
     {
-        $service = $this->getMock('Craft\ApiAuthService', array('getUserKeyModelByKey'));
+        $service = $this->getMock('Craft\ApiAuthService', array($methodName));
 
-        $service->expects($this->exactly(1))
-            ->method('getUserKeyModelByKey')
-            ->with($key)
-            ->willReturn($mockUserKeyModel);
+        $method = $service->expects($this->exactly(1))->method($methodName);
+        if ($param !== 'skip') {
+            $method->with($param);
+        }
+        $method->willReturn($mockUserKeyModel);
 
         return $service;
     }
 
     /**
-     * @param ApiAuth_UserKeyModel $mockUserKeyModel
-     * @return ApiAuthService|mock
+     * @param $success
+     * @return ApiAuth_UserKeyModel|mock
      */
-    private function setMockApiAuthServiceNewUserKeyModel(ApiAuth_UserKeyModel $mockUserKeyModel)
+    private function setMockUserKeyModelSaveExpectation($success)
     {
-        $service = $this->getMock('Craft\ApiAuthService', array('getNewUserKeyModel'));
-
-        $service->expects($this->exactly(1))
-            ->method('getNewUserKeyModel')
-            ->willReturn($mockUserKeyModel);
-
-        return $service;
+        $mockUserKeyModel = $this->getMockUserKeyModel();
+        $mockUserKeyModel->expects($this->exactly(1))
+            ->method('save')
+            ->willReturn($success);
+        return $mockUserKeyModel;
     }
 }
