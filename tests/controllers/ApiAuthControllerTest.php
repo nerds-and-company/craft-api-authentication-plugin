@@ -25,8 +25,6 @@ class ApiAuthControllerTest extends BaseTest
         //Plugin classes
         require_once __DIR__ . '/../../controllers/ApiAuthController.php';
         require_once __DIR__ . '/../../services/ApiAuthService.php';
-//        require_once __DIR__ . '/../../models/ApiAuth_UserKeyModel.php';
-//        require_once __DIR__ . '/../../records/ApiAuth_UserKeyRecord.php';
     }
 
     //==============================================================================================================
@@ -155,7 +153,7 @@ class ApiAuthControllerTest extends BaseTest
             ->method('getRequestType')
             ->willReturn($requestType);
 
-        if ($username && $password) {
+        if ($username !== null && $password !== null) {
             $mockRequestService->expects($this->exactly(2))
                 ->method('getRequiredPost')
                 ->willReturnMap(array(
