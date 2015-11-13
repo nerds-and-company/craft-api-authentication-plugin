@@ -19,6 +19,14 @@ class ApiAuthController extends BaseController
     protected $allowAnonymous = array('authenticate');
 
     /**
+     * Set the Access-Control-Allow-Origin header
+     */
+    public function init()
+    {
+        HeaderHelper::setHeader('Access-Control-Allow-Origin: *');
+    }
+
+    /**
      * Authenticate action.
      */
     public function actionAuthenticate()
