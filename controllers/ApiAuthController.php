@@ -16,7 +16,7 @@ namespace Craft;
 class ApiAuthController extends BaseController
 {
     /** @var bool */
-    protected $allowAnonymous = array('authenticate');
+    protected $allowAnonymous = array('authenticate', 'options');
 
     /**
      * Set the Access-Control-Allow-Origin header
@@ -31,32 +31,38 @@ class ApiAuthController extends BaseController
      */
     public function actionAuthenticate()
     {
-        try{
-            $this->requirePostRequest();
+        craft()->apiAuth->setCorsHeaders();
 
-            $username = craft()->request->getRequiredPost('username');
-            $password = craft()->request->getRequiredPost('password');
+        if(!craft()->apiAuth->isOptionsRequest()){
+            try{
+                $this->requirePostRequest();
 
-            if(craft()->userSession->login($username, $password)){
-                $key = craft()->apiAuth->generateKey();
-                $user = craft()->userSession->getUser();
+                $username = craft()->request->getRequiredPost('username');
+                $password = craft()->request->getRequiredPost('password');
 
-                if(craft()->apiAuth->saveKey($user, $key)){
-                    $this->returnJson(array(
-                        'key' => $key,
-                    ));
+                if(craft()->userSession->login($username, $password)){
+                    $key = craft()->apiAuth->generateKey();
+                    $user = craft()->userSession->getUser();
+
+                    if(craft()->apiAuth->saveKey($user, $key)){
+                        $this->returnJson(array(
+                            'key' => $key,
+                        ));
+                    } else {
+                        HeaderHelper::setHeader('HTTP/ 500 Internal server error');
+                        $this->returnErrorJson(Craft::t('Something went wrong'));
+                    }
                 } else {
-                    HeaderHelper::setHeader('HTTP/ 500 Internal server error');
-                    $this->returnErrorJson(Craft::t('Something went wrong'));
+                    HeaderHelper::setHeader('HTTP/ 401 Bad Credentials');
+                    $this->returnErrorJson(Craft::t('Invalid username or password'));
                 }
-            } else {
-                HeaderHelper::setHeader('HTTP/ 401 Bad Credentials');
-                $this->returnErrorJson(Craft::t('Invalid username or password'));
-            }
 
-        } catch(HttpException $e){
-            HeaderHelper::setHeader('HTTP/ ' . $e->statusCode);
-            $this->returnErrorJson($e->getMessage());
+            } catch(HttpException $e){
+                HeaderHelper::setHeader('HTTP/ ' . $e->statusCode);
+                $this->returnErrorJson($e->getMessage());
+            }
         }
+
+        craft()->end();
     }
 }
