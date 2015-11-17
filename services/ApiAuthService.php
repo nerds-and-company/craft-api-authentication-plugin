@@ -49,6 +49,24 @@ class ApiAuthService extends BaseApplicationComponent
     }
 
     /**
+     * Is it an options request?
+     *
+     * @return bool
+     */
+    public function isOptionsRequest()
+    {
+        return isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'OPTIONS';
+    }
+
+    /**
+     * Send an options response
+     */
+    public function setCorsHeaders()
+    {
+        HeaderHelper::setHeader('Access-Control-Allow-Headers: Authorization');
+    }
+
+    /**
      * @codeCoverageIgnore
      *
      * @return ApiAuth_UserKeyModel
