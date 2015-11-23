@@ -64,6 +64,7 @@ class ApiAuthService extends BaseApplicationComponent
     public function setCorsHeaders()
     {
         HeaderHelper::setHeader('Access-Control-Allow-Headers: Authorization');
+        HeaderHelper::setHeader('Access-Control-Allow-Origin: *');
     }
 
     /**
