@@ -38,6 +38,7 @@ class ApiAuthControllerTest extends BaseTest
     {
         $apiAuthController = $this->getMockApiAuthController('returnErrorJson', '');
 
+        $this->setSimpleMockApiAuthService();
         $this->setMockRequestService('GET');
 
         $apiAuthController->actionAuthenticate();
@@ -52,6 +53,7 @@ class ApiAuthControllerTest extends BaseTest
         $password = 'test123';
         $errorMessage = Craft::t('Invalid username or password');
 
+        $this->setSimpleMockApiAuthService();
         $this->setMockRequestService('POST', $username, $password);
         $this->setMockUserSessionService($username, $password, false);
 
@@ -197,6 +199,17 @@ class ApiAuthControllerTest extends BaseTest
         return $mockUserSessionService;
     }
 
+    private function setSimpleMockApiAuthService()
+    {
+        $mockApiAuthService = $this->getMockBuilder('Craft\ApiAuthService')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->setComponent(craft(), 'apiAuth', $mockApiAuthService);
+
+        return $mockApiAuthService;
+    }
+
     /**
      * @param string $key
      * @param UserModel $mockUser
@@ -206,9 +219,7 @@ class ApiAuthControllerTest extends BaseTest
      */
     private function setMockApiAuthService($key, UserModel $mockUser, $success)
     {
-        $mockApiAuthService = $this->getMockBuilder('Craft\ApiAuthService')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockApiAuthService = $this->setSimpleMockApiAuthService();
 
         $mockApiAuthService->expects($this->exactly(1))
             ->method('generateKey')
@@ -219,7 +230,6 @@ class ApiAuthControllerTest extends BaseTest
             ->with($mockUser, $key)
             ->willReturn($success);
 
-        $this->setComponent(craft(), 'apiAuth', $mockApiAuthService);
 
         return $mockApiAuthService;
     }
