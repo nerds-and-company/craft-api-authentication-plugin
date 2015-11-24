@@ -32,7 +32,7 @@ class ApiAuthPlugin extends BasePlugin
      */
     public function getVersion()
     {
-        return '0.1';
+        return '0.2';
     }
 
     /**
