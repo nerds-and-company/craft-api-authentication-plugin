@@ -80,7 +80,7 @@ class ApiAuthController extends BaseController
                 craft()->users->sendPasswordResetEmail($user);
             }
 
-            $this->returnJson(Craft::t('Email has been sent if address exists'));
+            $this->returnJson(array('message' => Craft::t('Email has been sent if address exists')));
 
         } catch (HttpException $e) {
             HeaderHelper::setHeader('HTTP/ ' . $e->statusCode);

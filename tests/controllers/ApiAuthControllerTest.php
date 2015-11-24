@@ -120,7 +120,7 @@ class ApiAuthControllerTest extends BaseTest
     public function testApiAuthControllerResetPasswordShouldReturnSuccessMessageWhenUserNotFound()
     {
         $username = 'username';
-        $message = Craft::t('Email has been sent if address exists');
+        $message = array('message' => Craft::t('Email has been sent if address exists'));
 
         $this->setSimpleMockApiAuthService();
         $this->setMockUsersService($username);
@@ -137,7 +137,7 @@ class ApiAuthControllerTest extends BaseTest
     public function testApiAuthControllerResetPasswordShouldSendMailWhenUserFound()
     {
         $username = 'username';
-        $message = Craft::t('Email has been sent if address exists');
+        $message = array('message' => Craft::t('Email has been sent if address exists'));
 
         $this->setSimpleMockApiAuthService();
         $this->setMockRequestService('POST', $username, null, 1);
