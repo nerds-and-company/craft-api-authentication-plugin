@@ -32,7 +32,7 @@ class ApiAuthPlugin extends BasePlugin
      */
     public function getVersion()
     {
-        return '0.1';
+        return '0.2';
     }
 
     /**
@@ -63,7 +63,8 @@ class ApiAuthPlugin extends BasePlugin
     public function registerSiteRoutes()
     {
         return array(
-            'api/authenticate' => array('action' => 'apiAuth/authenticate')
+            'api/authenticate' => array('action' => 'apiAuth/authenticate'),
+            'api/resetPassword' => array('action' => 'apiAuth/resetPassword')
         );
     }
 }
