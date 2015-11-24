@@ -36,10 +36,10 @@ class ApiAuthControllerTest extends BaseTest
      */
     public function testApiAuthControllerAuthenticateShouldReturnErrorWhenNotPostRequest()
     {
-        $apiAuthController = $this->getMockApiAuthController('returnErrorJson', '');
-
         $this->setSimpleMockApiAuthService();
         $this->setMockRequestService('GET');
+
+        $apiAuthController = $this->getMockApiAuthController('returnErrorJson', '');
 
         $apiAuthController->actionAuthenticate();
     }
@@ -101,6 +101,59 @@ class ApiAuthControllerTest extends BaseTest
         $apiAuthController->actionAuthenticate();
     }
 
+    /**
+     * @covers ::actionResetPassword
+     */
+    public function testApiAuthControllerResetPasswordShouldReturnErrorWhenNotPostRequest()
+    {
+        $this->setSimpleMockApiAuthService();
+        $this->setMockRequestService('GET');
+
+        $apiAuthController = $this->getMockApiAuthController('returnErrorJson', '');
+
+        $apiAuthController->actionResetPassword();
+    }
+
+    /**
+     * @covers ::actionResetPassword
+     */
+    public function testApiAuthControllerResetPasswordShouldReturnSuccessMessageWhenUserNotFound()
+    {
+        $username = 'username';
+        $message = Craft::t('Email has been sent if address exists');
+
+        $this->setSimpleMockApiAuthService();
+        $this->setMockUsersService($username);
+        $this->setMockRequestService('POST', $username, null, 1);
+
+        $apiAuthController = $this->getMockApiAuthController('returnJson', $message);
+
+        $apiAuthController->actionResetPassword();
+    }
+
+    /**
+     * @covers ::actionResetPassword
+     */
+    public function testApiAuthControllerResetPasswordShouldSendMailWhenUserFound()
+    {
+        $username = 'username';
+        $message = Craft::t('Email has been sent if address exists');
+
+        $this->setSimpleMockApiAuthService();
+        $this->setMockRequestService('POST', $username, null, 1);
+
+        $mockUser = $this->getMockUser();
+        $mockUsersService = $this->setMockUsersService($username, $mockUser);
+
+        $mockUsersService->expects($this->exactly(1))
+            ->method('sendPasswordResetEmail')
+            ->with($mockUser);
+
+        $apiAuthController = $this->getMockApiAuthController('returnJson', $message);
+
+        $apiAuthController->actionResetPassword();
+    }
+
     //==============================================================================================================
     //=================================================  MOCKS  ====================================================
     //==============================================================================================================
@@ -142,10 +195,11 @@ class ApiAuthControllerTest extends BaseTest
      * @param string $requestType
      * @param string $username
      * @param string $password
+     * @param int $count
      *
      * @return UserPermissionsService|mock
      */
-    private function setMockRequestService($requestType, $username = null, $password = null)
+    private function setMockRequestService($requestType, $username = null, $password = null, $count = 2)
     {
         $mockRequestService = $this->getMockBuilder('Craft\HttpRequestService')
             ->disableOriginalConstructor()
@@ -155,8 +209,8 @@ class ApiAuthControllerTest extends BaseTest
             ->method('getRequestType')
             ->willReturn($requestType);
 
-        if ($username !== null && $password !== null) {
-            $mockRequestService->expects($this->exactly(2))
+        if ($username !== null || $password !== null) {
+            $mockRequestService->expects($this->exactly($count))
                 ->method('getRequiredPost')
                 ->willReturnMap(array(
                     array('username', $username),
@@ -199,6 +253,9 @@ class ApiAuthControllerTest extends BaseTest
         return $mockUserSessionService;
     }
 
+    /**
+     * @return mock|ApiAuthService
+     */
     private function setSimpleMockApiAuthService()
     {
         $mockApiAuthService = $this->getMockBuilder('Craft\ApiAuthService')
@@ -234,5 +291,24 @@ class ApiAuthControllerTest extends BaseTest
         return $mockApiAuthService;
     }
 
+    /**
+     * @param string $username
+     * @param UserModel $user
+     * @return mock|UsersService
+     */
+    private function setMockUsersService($username, UserModel $user = null)
+    {
+        $mockUsersService = $this->getMockBuilder('Craft\UsersService')
+            ->disableOriginalConstructor()
+            ->getMock();
 
+        $mockUsersService->expects($this->exactly(1))
+            ->method('getUserByUsernameOrEmail')
+            ->with($username)
+            ->willReturn($user);
+
+        $this->setComponent(craft(), 'users', $mockUsersService);
+
+        return $mockUsersService;
+    }
 }
