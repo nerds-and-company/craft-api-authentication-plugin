@@ -34,7 +34,6 @@ class ApiAuthController extends BaseController
      */
     public function actionAuthenticate()
     {
-
         try {
             $this->requirePostRequest();
 
@@ -57,7 +56,6 @@ class ApiAuthController extends BaseController
                 HeaderHelper::setHeader('HTTP/ 401 Bad Credentials');
                 $this->returnErrorJson(Craft::t('Invalid username or password'));
             }
-
         } catch (HttpException $e) {
             HeaderHelper::setHeader('HTTP/ ' . $e->statusCode);
             $this->returnErrorJson($e->getMessage());
@@ -69,7 +67,6 @@ class ApiAuthController extends BaseController
      */
     public function actionResetPassword()
     {
-
         try {
             $this->requirePostRequest();
 

@@ -96,6 +96,6 @@ class ApiAuthService extends BaseApplicationComponent
      */
     protected function setHeader($key, $value)
     {
-        HeaderHelper::setHeader("$key: $value");
+        HeaderHelper::setHeader($key . ': ' . $value);
     }
 }
