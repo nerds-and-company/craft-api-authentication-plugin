@@ -143,6 +143,50 @@ class ApiAuthServiceTest extends BaseTest
         $this->assertFalse($result);
     }
 
+    /**
+     * @covers ::isOptionsRequest
+     */
+    public function testIsOptionsRequestShouldReturnFalseByDefault()
+    {
+        $service = new ApiAuthService();
+
+        $result = $service->isOptionsRequest();
+
+        $this->assertFalse($result);
+    }
+
+    /**
+     * @covers ::isOptionsRequest
+     */
+    public function testIsOptionsRequestShouldReturnTrueWhenOptionsRequest()
+    {
+        $_SERVER['REQUEST_METHOD'] = 'OPTIONS';
+
+        $service = new ApiAuthService();
+
+        $result = $service->isOptionsRequest();
+
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @covers ::setCorsHeaders
+     */
+    public function testSetCorsHeaderShouldSetCorsHeaders()
+    {
+        /** @var ApiAuthService|mock $service */
+        $service = $this->getMock('Craft\ApiAuthService', array('setHeader'));
+
+        $service->expects($this->exactly(2))
+            ->method('setHeader')
+            ->withConsecutive(
+                array('Access-Control-Allow-Headers', 'Authorization'),
+                array('Access-Control-Allow-Origin', '*')
+            );
+
+        $service->setCorsHeaders();
+    }
+
     //==============================================================================================================
     //==============================================  PROVIDERS  ===================================================
     //==============================================================================================================

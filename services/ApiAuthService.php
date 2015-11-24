@@ -63,8 +63,8 @@ class ApiAuthService extends BaseApplicationComponent
      */
     public function setCorsHeaders()
     {
-        HeaderHelper::setHeader('Access-Control-Allow-Headers: Authorization');
-        HeaderHelper::setHeader('Access-Control-Allow-Origin: *');
+        $this->setHeader('Access-Control-Allow-Headers', 'Authorization');
+        $this->setHeader('Access-Control-Allow-Origin', '*');
     }
 
     /**
@@ -80,11 +80,22 @@ class ApiAuthService extends BaseApplicationComponent
     /**
      * @codeCoverageIgnore
      *
-     * @param $key
+     * @param string $key
      * @return ApiAuth_UserKeyModel
      */
     protected function getUserKeyModelByKey($key)
     {
         return ApiAuth_UserKeyRecord::model()->findByAttributes(array('key' => $key));
+    }
+
+    /**
+     * @codeCoverageIgnore
+     *
+     * @param string $key
+     * @param string $value
+     */
+    protected function setHeader($key, $value)
+    {
+        HeaderHelper::setHeader("$key: $value");
     }
 }
