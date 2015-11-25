@@ -15,6 +15,12 @@ namespace Craft;
  */
 abstract class AbstractAuthorizedApiController extends BaseController
 {
+    /**
+     * Allow anonymous access to this controller.
+     *
+     * @var bool
+     */
+    protected $allowAnonymous = true;
 
     /**
      * Initialize controller
