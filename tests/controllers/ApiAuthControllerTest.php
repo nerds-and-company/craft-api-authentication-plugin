@@ -96,7 +96,16 @@ class ApiAuthControllerTest extends BaseTest
         $this->setMockUserSessionService($username, $password, true, $mockUser);
         $this->setMockApiAuthService($key, $mockUser, true);
 
-        $apiAuthController = $this->getMockApiAuthController('returnJson', array('key' => $key));
+        $apiAuthController = $this->getMockApiAuthController('returnJson', array(
+            'key' => $key,
+            'user' => array(
+                'username' => $mockUser->username,
+                'photo' => $mockUser->photo,
+                'firstName' => $mockUser->firstName,
+                'lastName' => $mockUser->lastName,
+                'email' => $mockUser->email,
+            ),
+        ));
 
         $apiAuthController->actionAuthenticate();
     }
