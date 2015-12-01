@@ -47,6 +47,7 @@ class ApiAuthController extends BaseController
                 if (craft()->apiAuth->saveKey($user, $key)) {
                     $this->returnJson(array(
                         'key' => $key,
+                        'user' => $this->extractUserData($user),
                     ));
                 } else {
                     HeaderHelper::setHeader('HTTP/ 500 Internal server error');
@@ -83,5 +84,23 @@ class ApiAuthController extends BaseController
             HeaderHelper::setHeader('HTTP/ ' . $e->statusCode);
             $this->returnErrorJson($e->getMessage());
         }
+    }
+
+    /**
+     * Exposes interesting user fields to the API.
+     *
+     * @param UserModel $user
+     *
+     * @return array
+     */
+    private function extractUserData(UserModel $user)
+    {
+        return array(
+            'username'  => $user->username,
+            'photo'     => $user->photo,
+            'firstName' => $user->firstName,
+            'lastName'  => $user->lastName,
+            'email'     => $user->email,
+        );
     }
 }
